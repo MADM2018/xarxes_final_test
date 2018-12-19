@@ -1,0 +1,78 @@
+---
+title: "Final exam. 2ond part"
+output: html_document
+---
+
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=8, fig.height=8, fig.align="center", echo=TRUE, warning=FALSE, message=FALSE,autodep = TRUE,cache=TRUE)
+library(knitr)
+library(printr)
+library(igraph)
+```
+
+
+**1)** I did not want to finish the course without introducing one of my pet networks. The files **GA_edges.txt** and **GA_nodes.txt** contain the links and nodes (with several attributes) of the sexual contact network among "Grey's Anatomy" characters in seasons 1-8. (Btw, a nice TFM topic: to automatically extract from the episodes' Short Summaries provided in the Grey's Anatomy Wiki (https://greysanatomy.fandom.com/wiki/Grey%27s_Anatomy_Universe_Wiki) (a richest version of) this sexual contact network for the whole 15 seasons so far period and to analyze the network with a suitable stochastic model.)
+
+Clean Up
+``` {r} 
+rm(list=ls())
+setwd('d:/MADM/redes sociales/FINAL/')
+```
+
+Define a network with these data frames, and make sure that its nodes have as attributes at least their names and (anatomic) sex.
+
+``` {r}
+ga_nodes <- read.table("GA_nodes.txt", header=TRUE, as.is=T)
+ga_edges <- read.table("GA_edges.txt", header=TRUE, as.is=T)
+
+ga <- graph_from_data_frame(d = ga_edges, directed = FALSE)
+
+V(ga)$name = as.character(ga_nodes$name[match(V(ga)$name, rownames(ga_nodes))])
+V(ga)$sex = as.character(ga_nodes$sex[match(V(ga)$name, ga_nodes$name)])
+
+plot(ga)
+
+```
+
+*a)* Provide a statistical summary of this network: order, number of nodes of each sex, size, density, number of connected components, average degree, scatter plot of its degrees distribution, average distance, diameter, average clustering coefficient. Plot it with the nodes labelled with the characters' names and differently colored with their sex. 
+
+``` {r}
+ga_order <- gorder(ga)
+ga_size <- gsize(ga)
+ga_dens <- round(edge_density(ga),4)
+
+ga_male = sum(V(ga)$sex == "M")
+ga_female = sum(V(ga)$sex == "F")
+
+ga_cc <- components(ga)$no
+ga_avgdeg <- round(mean(degree(ga)), 0)
+
+ga_diam <- diameter(ga)
+ga_avgdist <- round(mean_distance(ga), 2)
+ga_avg_clust_coef <- round(transitivity(ga, type="average"), 4)
+```
+
+* Order: `r ga_order`
+* Number of male nodes: `r ga_male`
+* Number of female nodes: `r ga_female`
+* Size: `r ga_size`
+* Density: `r ga_dens`
+* Number of connected components: `r ga_cc` 
+* Average degree: `r ga_avgdeg`
+```{r}
+ga_deg_dist = degree_distribution(ga)
+plot(1:length(ga_deg_dist), ga_deg_dist, main="Scatter plot of GA degrees distribution", xlab="Degree", ylab="Distribution", pch=19)
+```
+
+* Average distance: `r ga_avgdist`
+* Diameter: `r ga_diam`
+* Average clustering coefficient: `r ga_avg_clust_coef`
+
+
+```{r}
+V(ga)$color=V(ga)$sex
+V(ga)$color=gsub("F","red",V(ga)$color) #Females will be red
+V(ga)$color=gsub("M","blue",V(ga)$color) #Males will be blue
+plot(ga)
+```
