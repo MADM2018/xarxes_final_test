@@ -51,6 +51,7 @@ ga_avgdeg <- round(mean(degree(ga)), 0)
 ga_diam <- diameter(ga)
 ga_avgdist <- round(mean_distance(ga), 2)
 ga_avg_clust_coef <- round(transitivity(ga, type="average"), 4)
+ga_trans = transitivity(ga)
 ```
 
 * Order: `r ga_order`
@@ -68,6 +69,7 @@ plot(1:length(ga_deg_dist), ga_deg_dist, main="Scatter plot of GA degrees distri
 * Average distance: `r ga_avgdist`
 * Diameter: `r ga_diam`
 * Average clustering coefficient: `r ga_avg_clust_coef`
+* Tra: `r ga_trans`
 
 
 ```{r}
