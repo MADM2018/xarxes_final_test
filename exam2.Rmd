@@ -1,6 +1,8 @@
 ---
 title: "Final exam. 2nd part"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 <font size="4"> **Name:**   Reinier Mujica   </font> 
@@ -158,6 +160,74 @@ Como se puede apreciar existen `r four_cycles_cant` de tamaño 4 por lo que esta
 
 *f)* Is this network consistent with the E-R model? And with the basic undirected Barabasi-Albert's model? Did you find the answers surprising?
 
+```{r}
+set.seed(1991)
+ER <- function(x,y) {
+  G = sample_gnp(x, y, directed = FALSE, loops = FALSE)
+  c(gorder(G),
+    gsize(G),
+    edge_density(G),
+    components(G)$no,
+    components(G)$csize[1],
+    mean(degree(G)),
+    mean_distance(G),
+    diameter(G),
+    transitivity(G, type="average"),
+    transitivity(G, type="global"))
+    }
+X1 <- replicate(1000, ER(gorder(ga), edge_density(ga)))
+er_model <- rbind(
+                 c(round(apply(X1, FUN = mean, MARGIN = 1), 2)))
+real_network <-  cbind(gorder(ga),
+                  gsize(ga),
+                  round(edge_density(ga),2),
+                  components(ga)$no,
+                  components(ga)$csize[1],
+                  round(mean(degree(ga)),2),
+                  round(mean_distance(ga),2),
+                  diameter(ga),
+                  transitivity(ga, type="average"),
+                  transitivity(ga, type="global"))
+dimnames(er_model) = list(c("E-R Model"), c("Order", "Size", "Density", "Components", "Largest Component Size", "Average Degree", "Average Distance", "Diameter", "Average Clustering Coefficient", "Transitivity"))
+dimnames(real_network) = list(c("Real Network"), c("Order", "Size", "Density", "Components", "Largest Component Size", "Average Degree", "Average Distance", "Diameter", "Average Clustering Coefficient", "Transitivity"))
+```
+
+```{r}
+set.seed(1991)
+BAM <- function(x, y) {
+  G = sample_pa(n = x, m = y, directed = FALSE, out.pref = TRUE)
+  c(gorder(G),
+    gsize(G),
+    edge_density(G),
+    components(G)$no,
+    components(G)$csize[1],
+    mean(degree(G)),
+    mean_distance(G),
+    diameter(G),
+    transitivity(G, type="average"),
+    transitivity(G, type="global"))
+    }
+X2 <- replicate(1000, BAM(gorder(ga), 2))
+bam_model <- rbind(
+                 c(round(apply(X2, FUN = mean, MARGIN = 1), 2)))
+dimnames(bam_model) = list(c("B-A Model"), c("Order", "Size", "Density", "Components", "Largest Component Size", "Average Degree", "Average Distance", "Diameter", "Average Clustering Coefficient", "Transitivity"))
+```
+
+```{r}
+real_network
+```
+
+```{r}
+er_model
+```
+
+```{r}
+bam_model
+```
+
+La respuesta no me sorprende tanto, pues en esta red cada nodo esta enlazado con igual probabilidad que el resto de la red. Es decir que la probabilidad de que una persona en esta red sea homosexual, bisexual o heterosexual es la misma.
+
+Después de analizar los resultados de los dos modelos, creo que esta red es mas similar al modelo E-R y no al modelo B-A.
 
 
 *g)* Partition the network into communities using the maximum modularity greedy algorithm (as implemented in **cluster_fast_greedy**). Plot the graph highlighting the communities.
@@ -171,9 +241,10 @@ plot(fg, ga, layout=coords)
 ga_mod = modularity(fg)
 
 ```
+En el contexto de esta red la modularidad es un indice del número de relaciones sexuales en los diferentes grupos o comunidades respecto al número de relaciones producidas por el modelo de configuración (*configuration model*).
 La modularidad de esta partición es `r ga_mod`.
 
 *h)* **Extra bonus:** Are the  communities found in the previous point explained by some of the nodes' attributes contained in the nodes data frame?
 
-En algunos casos si, por ejemplo hay una comunidad conformada por solo personas de color negro. En otros casos estan conformadas por personas de una misma posición, o posiciones similares.
+En algunos casos si, por ejemplo hay una comunidad conformada por solo personas de color negro, hay otras comunidades conformadas solo por personas de color blanco. En otros casos estan conformadas por personas de una misma posición, o posiciones similares.
 
