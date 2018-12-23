@@ -202,6 +202,12 @@ plot(ga)</code></pre>
 }</code></pre>
 <p>Como resultado de evaluar el grafo en la red queda FALSE.</p>
 <p><em>c)</em> Who are the most central 3 nodes according to degree, closeness, betweenness and eigenvector centrality? Comment the differences you found, if any.</p>
+<pre class="r"><code>degree_centr = attr(sort(degree(ga, normalized=TRUE), decreasing=TRUE), &quot;name&quot;)[1:3]
+clos_centr = attr(sort(closeness(ga, normalized=TRUE), decreasing=TRUE), &quot;name&quot;)[1:3]
+betw_centr = attr(sort(betweenness(ga, normalized=TRUE), decreasing=TRUE), &quot;name&quot;)[1:3]
+eige_centr = attr(sort(eigen_centrality(ga, scale=FALSE)$vector, decreasing=TRUE), &quot;name&quot;)[1:3]</code></pre>
+<p>Los nodos mas centrales por centralidad de tipo <em>grados</em> son karev, sloan, torres. Los nodos mas centrales por centralidad de tipo <em>closeness</em> son torres, sloan, addison. Los nodos mas centrales por centralidad de tipo <em>betweenness</em> son sloan, karev, altman. Los nodos mas centrales por centralidad de tipo <em>eigenvector</em> son karev, torres, sloan.</p>
+<p>Los nodos mas centrales se pude decir que son <strong>karev</strong>, <strong>torres</strong> y <strong>sloan</strong>. Estan presentes en casi todos los tipos de centralidades.</p>
 <p><em>d)</em> If you wanted to test one single character for sexually transmitted infections, who would he/she be? Why?</p>
 <p><em>e)</em> P. S. Bearman, J. Moody and K. Stovel (in their classic “Chains of affection: The structure of adolescent romantic and sexual networks” (<em>Am. J. Soc.</em> 110 (2004), 44-91) on romantic relations in a High School which I have mentioned several times in the course) found a prohibition against coupling with a former partner’s former partner’s former partner (and justified it on status implications). Without taking into account the time of the sexual contacts (which are not available in our network), what kind of structures does this rule “forbid”? Check whether this network satisfies this prohibition or not. (Hint: Take a glance at the function <strong>kcycle.census</strong> in the <strong>sna</strong> package.)</p>
 <p><em>f)</em> Is this network consistent with the E-R model? And with the basic undirected Barabasi-Albert’s model? Did you find the answers surprising?</p>

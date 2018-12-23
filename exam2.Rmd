@@ -117,9 +117,20 @@ is_bipartite2 = function(graph, attribute = 'sex') {
 ```
 Como resultado de evaluar el grafo en la red queda `r is_bipartite2(ga)`.
 
-
-
 *c)* Who are the most central 3 nodes according to degree, closeness, betweenness and eigenvector centrality? Comment the differences you found, if any.
+```{r}
+degree_centr = attr(sort(degree(ga, normalized=TRUE), decreasing=TRUE), "name")[1:3]
+clos_centr = attr(sort(closeness(ga, normalized=TRUE), decreasing=TRUE), "name")[1:3]
+betw_centr = attr(sort(betweenness(ga, normalized=TRUE), decreasing=TRUE), "name")[1:3]
+eige_centr = attr(sort(eigen_centrality(ga, scale=FALSE)$vector, decreasing=TRUE), "name")[1:3]
+```
+
+Los tres nodos mas centrales por centralidad de tipo *grados* son `r degree_centr`.
+Los tres nodos mas centrales por centralidad de tipo *closeness* son `r clos_centr`.
+Los tres nodos mas centrales por centralidad de tipo *betweenness* son `r betw_centr`.
+Los tres nodos mas centrales por centralidad de tipo *eigenvector* son `r eige_centr`.
+
+Los nodos **karev**, **torres** y **sloan** son los que mas se repiten en los tipos de centralidades. En la de tipo *closeness* aparece **addison** ya que este nodo se encuentra mas cercano al resto que **karev**. Y en la de tipo *betweenness* aparece **altman** ya que a traves de este se conecta un subgrafo a la red mayor que el de **torres** en este caso.
 
 *d)* If you wanted to test one single character for sexually transmitted infections, who would he/she be? Why?
 
