@@ -11,6 +11,10 @@ output: html_document
 knitr::opts_chunk$set(fig.width=8, fig.height=8, fig.align="center", echo=TRUE, warning=FALSE, message=FALSE,autodep = TRUE,cache=TRUE)
 library(knitr)
 library(printr)
+
+library(sna)
+library(intergraph)
+
 library(igraph)
 ```
 
@@ -126,20 +130,50 @@ eige_centr = attr(sort(eigen_centrality(ga, scale=FALSE)$vector, decreasing=TRUE
 ```
 
 Los tres nodos mas centrales por centralidad de tipo *grados* son `r degree_centr`.
+
+
 Los tres nodos mas centrales por centralidad de tipo *closeness* son `r clos_centr`.
+
 Los tres nodos mas centrales por centralidad de tipo *betweenness* son `r betw_centr`.
+
 Los tres nodos mas centrales por centralidad de tipo *eigenvector* son `r eige_centr`.
 
 Los nodos **karev**, **torres** y **sloan** son los que mas se repiten en los tipos de centralidades. En la de tipo *closeness* aparece **addison** ya que este nodo se encuentra mas cercano al resto que **karev**. Y en la de tipo *betweenness* aparece **altman** ya que a traves de este se conecta un subgrafo a la red mayor que el de **torres** en este caso.
 
 *d)* If you wanted to test one single character for sexually transmitted infections, who would he/she be? Why?
 
+Escogería a **torres** porque es el nodo que mayor indice de centralidad de tipo *closeness* tiene, y como resultado es el que propaga la información mas rápido a la red.
+
 *e)* P. S. Bearman, J. Moody and K. Stovel (in their classic "Chains of affection: The structure of adolescent romantic and sexual networks" (*Am. J. Soc.* 110 (2004), 44-91) on romantic relations in a High School which I have mentioned several times in the course) found a prohibition against coupling with a former partner’s former partner’s former partner (and justified it on status implications). Without taking into account the time of the sexual contacts (which are not available in our network), what kind of structures does this rule "forbid"? Check whether this network satisfies this prohibition or not. (Hint: Take a glance at the function **kcycle.census** in the **sna** package.)
 
+Esta regla, según lo que entiendo, prohibe las relaciones entre un individuo y el la expareja de una de las exparejas de su pareja actual. Es decir que no se admiten ciclos de tamaño 4 en la supuesta red. Para verificar esto en la red de Anatomia de Grey usamos el siguiente código para detectar todos los ciclos en la red hasta tamaño 4.
+
+```{r}
+net = asNetwork(ga)
+net_cycles = kcycle.census(dat = net, maxlen = 4,tabulate.by.vertex = TRUE, mode = "digraph")
+four_cycles_cant = net_cycles$cycle.count[3]
+
+```
+Como se puede apreciar existen `r four_cycles_cant` de tamaño 4 por lo que esta red no satisface esta prohibición.
+
 *f)* Is this network consistent with the E-R model? And with the basic undirected Barabasi-Albert's model? Did you find the answers surprising?
+
+
 
 *g)* Partition the network into communities using the maximum modularity greedy algorithm (as implemented in **cluster_fast_greedy**). Plot the graph highlighting the communities.
 What is the modularity value of this partition? And what is the meaning of this value (in the context of this example, not the abstract definition)? 
 
+```{r}
+coords=layout_with_fr(ga)
+fg=cluster_fast_greedy(ga)
+plot(fg, ga, layout=coords)
+
+ga_mod = modularity(fg)
+
+```
+La modularidad de esta partición es `r ga_mod`.
+
 *h)* **Extra bonus:** Are the  communities found in the previous point explained by some of the nodes' attributes contained in the nodes data frame?
+
+En algunos casos si, por ejemplo hay una comunidad conformada por solo personas de color negro. En otros casos estan conformadas por personas de una misma posición, o posiciones similares.
 
