@@ -42,6 +42,7 @@ plot(ga)
 ```
 
 *a)* Provide a statistical summary of this network: order, number of nodes of each sex, size, density, number of connected components, **size of the largest connected component if there are more than one**, average degree, scatter plot of its degrees distribution, average distance, diameter, and average clustering coefficient. Plot it with the nodes labelled with the characters' names and differently colored with their sex. 
+
 ``` {r}
 ga_order <- gorder(ga)
 ga_size <- gsize(ga)
@@ -57,7 +58,7 @@ ga_avgdeg <- round(mean(degree(ga)), 0)
 
 ga_diam <- diameter(ga)
 ga_avgdist <- round(mean_distance(ga), 0)
-ga_avg_clust_coef <- round(transitivity(ga, type="average"), 4)
+ga_avg_clust_coef <- transitivity(ga, type="average")
 ```
 
 * Order: `r ga_order`
@@ -87,12 +88,36 @@ plot(ga)
 
 *a.2)* Comment the meaning and implications (for this specific network) of the density, number of connected components and size of the largest, average degree, average distance,  and average clustering coefficient values obtained.
 
-La densidad de la red es muy baja `r ga_dens`, esto implica que no todas los personajes tuvieron relaciones entre todos ellos, el número de componentes conexos es `r ga_cc`, es muy bajo y el primer componente tiene un tamaño de `r ga_cc_size_lg` que es muy superior al resto de componentes, por lo que se puede considerar al grafo como una componente conexa gigante, esto implica que hubo un grupo de personas muy activas sexualmente y otras menos. El promedio de los grados de los nodos es `r ga_avgdeg` quiere decir que como promedio una persona tuvo relaciones con dos mas. La distancia promedio es `r ga_avgdist` esto implica que los lazos sexuales como promedio incluyen a `r ga_avgdist` personas. El coeficiente de clustering promedio es `r ga_avg_clust_coef` esto quiere decir que no hay triangulos, es decir que dos personas que estuvieron con una tercera nunca se enrollaron, concluyendo que no hubieron relaciones homosexuales en la serie.
+La densidad de la red es muy baja `r ga_dens`, esto implica que no todas los personajes tuvieron relaciones entre todos ellos, el número de componentes conexos es `r ga_cc`, es muy bajo y el primer componente tiene un tamaño de `r ga_cc_size_lg` que es muy superior al resto de componentes, por lo que se puede considerar al grafo como una componente conexa gigante, esto implica que hubo un grupo de personas muy activas sexualmente y otras menos. El promedio de los grados de los nodos es `r ga_avgdeg` quiere decir que como promedio una persona tuvo relaciones con dos mas. La distancia promedio es `r ga_avgdist` esto implica que los lazos sexuales como promedio incluyen a `r ga_avgdist` personas. El coeficiente de clustering promedio es `r ga_avg_clust_coef` esto quiere decir que no hay triangulos amorosos, es decir que dos personas que estuvieron con una tercera nunca se enrollaron ellas.
 
 
 *b)* Is this network bipartite? Justify your answer and explain its meaning for this specific network. (Caution! **is_bipartite** does not answer this question. Find the right function to answer it, or find some other way to answer it without a predefined function.)
 
-Si es un grafo bipartito ya que como tenemos dos grupos de nodos (Hombres y Mujeres) y no tenemos relaciones homosexuales por ser el coeficiente de clustering promedio: `r ga_avg_clust_coef`, entonces podemos concluir que no hay ninguna arista enlazando dos nodos del mismo tipo y como consecuencia podemos separar el grafo en dos grupos de nodos Hombres y Mujeres.
+A simple vista se puede observar que el grafo no es bipartito, pues se observan algunas aristas entre nodos del mismo color, dando lugar a relaciones homosexuales en la red. Por esto no podemos separar los nodos en dos conjuntos al haber aristas entre nodos de un mismo tipo. Adicionalmente si se quiere chequear manualmente esto, basta con recorrer las aristas del grafo y detectar alguna conexion entre nodos con mismo color. A continuación programé una función que hace lo anterior.
+
+```{r}
+is_bipartite2 = function(graph, attribute = 'sex') {
+  edges = as_edgelist(graph, names = TRUE)
+  
+  isBipartite = TRUE  #assume bipartite
+  
+  for(i in 1:gsize(graph)) {
+    firstName = edges[i,1]
+    secondName = edges[i,2]
+    
+    firstAttr = vertex_attr(graph = graph, name = attribute, index = which(V(graph)$name == firstName))
+    secondAttr = vertex_attr(graph = graph, name = attribute, index = which(V(graph)$name == secondName))
+    
+    isBipartite = isBipartite && (firstAttr != secondAttr)
+  }
+  
+  return(isBipartite)
+}
+
+```
+Como resultado de evaluar el grafo en la red queda `r is_bipartite2(ga)`.
+
+
 
 *c)* Who are the most central 3 nodes according to degree, closeness, betweenness and eigenvector centrality? Comment the differences you found, if any.
 
